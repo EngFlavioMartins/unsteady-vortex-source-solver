@@ -97,12 +97,12 @@ clTheo    = [np.sin(0), 2*np.pi*np.deg2rad(20) ]
 
 This solver also allows for easily plotting velocity, vorticity and pressure fields:
 
-![Vorticity](Plots/PitchingSystems_Fields.pdf)
+![Vorticity](Plots/PitchingSystems_Fields.png)
 
 
 as well as force coefficients:
 
-![Vorticity](Plots/CL_PitchingMotion.pdf)
+![Vorticity](Plots/CL_PitchingMotion.png)
 
 ### References
 ---
