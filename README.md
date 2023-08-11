@@ -92,10 +92,20 @@ clTheo    = [np.sin(0), 2*np.pi*np.deg2rad(20) ]
 
 7. Simulation of a flat-plate airfoil suddenly put into steady forward motion at $t=0$
 
+![Plunging airfoil case](Plots/Steady.gif)
 
+
+This solver also allows for easily plotting velocity, vorticity and pressure fields:
+
+![Vorticity](Plots/PitchingSystems_Fields.pdf)
+
+
+as well as force coefficients:
+
+![Vorticity](Plots/CL_PitchingMotion.pdf)
 
 ### References
 ---
 
  * Katz, Joseph, and Allen Plotkin. Low-speed aerodynamics. Vol. 13. Cambridge university press, 2001.
- * Anderson, John. EBOOK: Fundamentals of Aerodynamics (SI units). McGraw hill, 2011.
+ * Anderson, John. EBOOK: Fundamentals of Aerodynamics (SI units). McGraw Hill, 2011.
