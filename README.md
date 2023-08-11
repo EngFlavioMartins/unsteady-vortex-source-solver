@@ -1,4 +1,4 @@
-# Unsteady_Lifting_Panel_Method
+# Unsteady Lifting Panel Method
 
 `Unsteady_Lifting_Panel_Method` is a Python library with solvers that let you easily model and simulate unsteady airfoil aerodynamics based on the vortex source/panel method.
 
@@ -17,10 +17,20 @@ Contents
  ### Installation
 ---
 
-$ git clone https://www.github.com/alichtman/shallow-backup.git
+The installation of the current project is very simple. If you have a clean Python installation, just type in your terminal the commands below.
+
+```bash
+$ git clone https://github.com/PRIDEmartins/Unsteady_Vortex_Source_Method.git
 $ pip install numpy as np
 $ pip install importlib 
 $ pip install matplotlib.pyplot as plt
+```
+
+It is also highly recommended to install Anaconda or Miniconda:
+
+<https://docs.conda.io/en/latest/miniconda.html>
+<https://www.anaconda.com/>
+
 
 ### Usage
 ---
@@ -73,9 +83,15 @@ alphaTheo = [0, 20]
 clTheo    = [np.sin(0), 2*np.pi*np.deg2rad(20) ]
 ```
 
-5. Simulation of a flat-plate airfoil plunging at different reduced frequencies, $k$, such that $$ k := 2 \pi f c / U_\infty, $$ where $f$ is the plunging motion frequency, $c$ is the flat-plate's chord length and $U_\infty$ is the reference velocity.
+5. Simulation of a flat-plate plunging airfoil at different reduced plunging frequencies, $k$, such that $ k := 2 \pi f c / U_\infty $, where $f$ is the plunging motion frequency, $c$ is the flat-plate's chord length and $U_\infty$ is the reference velocity.
 
 ![Plunging airfoil case](Plots/Plunging.gif)
+
+6. Simulation of a flat-plate pitching airfoil at different reduced pitching frequencies, $k$, such that $ k := 2 \pi f c / U_\infty $, where $f$ is the pitching motion frequency, $c$ is the flat-plate's chord length and $U_\infty$ is the reference velocity.
+
+
+7. Simulation of a flat-plate airfoil suddenly put into steady forward motion at $t=0$
+
 
 
 ### References
