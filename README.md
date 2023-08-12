@@ -2,7 +2,37 @@
 
 `Unsteady_Lifting_Panel_Method` is a Python library with solvers that let you easily model and simulate unsteady airfoil aerodynamics based on the vortex source/panel method.
 
-![Pitching airfoil case](Plots/Pitching.gif)
+
+![Pitching airfoil case](Plots/Lifting_Line_Scheme.png)
+Lifting_Line_Scheme
+
+Here, we solve a linear system of the form:
+
+$$\begin{bmatrix}
+      a_{1,1}   & a_{1,2}   & \cdots & a_{1,n_p}   & a_{W,t,1}    \\
+      a_{2,1}   & a_{2,2}   & \cdots & a_{1,n_p}   & a_{W,t,2}    \\
+      \vdots    & \vdots    & \ddots & \vdots      & \vdots       \\
+      a_{n_p,1} & a_{n_p,2} & \cdots & a_{n_p,n_p} & a_{W,t,n_p}  \\
+      1         & 1         & \cdots & 1           & 1
+\end{bmatrix}
+\begin{Bmatrix}
+      \Gamma_1 \\ \Gamma_2 \\ \vdots \\ \Gamma_{n_p} \\ \Gamma_{W,t}
+\end{Bmatrix}
+=
+\begin{Bmatrix}
+      \text{RHS}_1 \\ \text{RHS}_2 \\  \vdots \\ \text{RHS}_{n_p} \\ \sum_{k=1}^{k=n_p} \Gamma_k(t-\Delta t)
+\end{Bmatrix}
+$$
+
+where $$\text{RHS}_i=- (U_x(t)+u_{W,x}, U_y(t)+u_{W,y})_i \cdot \vec{n}_i.$$ 
+
+The linear system above is a result of the combination of
+
+1. Non-penetration boundary condition at the panels describing the airfoil's panels (i.e., the panel-normal fluid velocity is zero at the collocation points);
+2. Kelvin's theorem of conservation of circulation; and
+3. The vortex-source-induced velocities at the different wake and airfoil control points.
+
+For a more in-depth explanation of the model, please verify the corresponding topics in the literature shared in [References](#References).
 
 Contents
 ========
@@ -11,8 +41,6 @@ Contents
  * [Usage](#usage)
  * [Output Structure](#output-structure)
  * [References](#References)
-
-
 
  ### Installation
 ---
@@ -28,8 +56,9 @@ $ pip install matplotlib.pyplot as plt
 
 It is also highly recommended to install Anaconda or Miniconda:
 
-<https://docs.conda.io/en/latest/miniconda.html>
-<https://www.anaconda.com/>
+> <https://docs.conda.io/en/latest/miniconda.html>
+
+> <https://www.anaconda.com/>
 
 
 ### Usage
@@ -42,7 +71,32 @@ The Jupyter Notebook `./Examples.ipynb` contains a series of examples of how to 
 3. Time-step sizing independence analysis
 4. Solution of steady flows: plot angle-of-attack vs. lift-coefficient to compare the current method against $2\pi$-curve
 
-```haskell
+5. Simulation of a flat-plate plunging airfoil at different reduced plunging frequencies, $k$, such that $ k := 2 \pi f c / U_\infty $, where $f$ is the plunging motion frequency, $c$ is the flat-plate's chord length and $U_\infty$ is the reference velocity.
+
+![Plunging airfoil case](Plots/Plunging.gif)
+
+6. Simulation of a flat-plate pitching airfoil at different reduced pitching frequencies, $k$, such that $ k := 2 \pi f c / U_\infty $, where $f$ is the pitching motion frequency, $c$ is the flat-plate's chord length and $U_\infty$ is the reference velocity.
+
+![Pitching airfoil case](Plots/Pitching.gif)
+
+
+7. Simulation of a flat-plate airfoil suddenly put into steady forward motion at $t=0$
+
+![Plunging airfoil case](Plots/Steady.gif)
+
+
+This solver also allows for easily plotting velocity, vorticity and pressure fields:
+
+![Vorticity](Plots/PitchingSystem_Fields.png)
+
+
+as well as force coefficients:
+
+![Vorticity](Plots/CL_PitchingMotion.png)
+
+### Example of usage:
+
+```python
 ncases = 8
 
 alpha0       = np.linspace(0.1, 20, num=ncases) * np.pi/180  ## initial angle of attacks, rad
@@ -82,27 +136,6 @@ CL        = totalCirculation * np.cos(alpha0) / (0.5 * -U[-1]) # lift coeff.
 alphaTheo = [0, 20]
 clTheo    = [np.sin(0), 2*np.pi*np.deg2rad(20) ]
 ```
-
-5. Simulation of a flat-plate plunging airfoil at different reduced plunging frequencies, $k$, such that $ k := 2 \pi f c / U_\infty $, where $f$ is the plunging motion frequency, $c$ is the flat-plate's chord length and $U_\infty$ is the reference velocity.
-
-![Plunging airfoil case](Plots/Plunging.gif)
-
-6. Simulation of a flat-plate pitching airfoil at different reduced pitching frequencies, $k$, such that $ k := 2 \pi f c / U_\infty $, where $f$ is the pitching motion frequency, $c$ is the flat-plate's chord length and $U_\infty$ is the reference velocity.
-
-
-7. Simulation of a flat-plate airfoil suddenly put into steady forward motion at $t=0$
-
-![Plunging airfoil case](Plots/Steady.gif)
-
-
-This solver also allows for easily plotting velocity, vorticity and pressure fields:
-
-![Vorticity](Plots/PitchingSystem_Fields.png)
-
-
-as well as force coefficients:
-
-![Vorticity](Plots/CL_PitchingMotion.png)
 
 ### References
 ---
