@@ -6,33 +6,13 @@
 ![Pitching airfoil case](Plots/Lifting_Line_Scheme.png)
 Lifting_Line_Scheme
 
-Here, we solve a linear system of the form:
-
-$$\begin{bmatrix}
-      a_{1,1}   & a_{1,2}   & \cdots & a_{1,n_p}   & a_{W,t,1}    \\
-      a_{2,1}   & a_{2,2}   & \cdots & a_{1,n_p}   & a_{W,t,2}    \\
-      \vdots    & \vdots    & \ddots & \vdots      & \vdots       \\
-      a_{n_p,1} & a_{n_p,2} & \cdots & a_{n_p,n_p} & a_{W,t,n_p}  \\
-      1         & 1         & \cdots & 1           & 1
-\end{bmatrix}
-\begin{Bmatrix}
-      \Gamma_1 \\ \Gamma_2 \\ \vdots \\ \Gamma_{n_p} \\ \Gamma_{W,t}
-\end{Bmatrix}
-=
-\begin{Bmatrix}
-      \text{RHS}_1 \\ \text{RHS}_2 \\  \vdots \\ \text{RHS}_{n_p} \\ \sum_{k=1}^{k=n_p} \Gamma_k(t-\Delta t)
-\end{Bmatrix}
-$$
-
-where $$\text{RHS}_i=- (U_x(t)+u_{W,x}, U_y(t)+u_{W,y})_i \cdot \vec{n}_i.$$ 
-
-The linear system above is a result of the combination of
+The curent model solver a linear system with the following assumptions:
 
 1. Non-penetration boundary condition at the panels describing the airfoil's panels (i.e., the panel-normal fluid velocity is zero at the collocation points);
 2. Kelvin's theorem of conservation of circulation; and
 3. The vortex-source-induced velocities at the different wake and airfoil control points.
 
-For a more in-depth explanation of the model, please verify the corresponding topics in the literature shared in [References](#References).
+For a more in-depth explanation of the model, please verify the corresponding topics in the literature shared in [References](#References) and the attached report `./Report.pdf`.
 
 Contents
 ========
@@ -82,17 +62,16 @@ The Jupyter Notebook `./Examples.ipynb` contains a series of examples of how to 
 
 7. Simulation of a flat-plate airfoil suddenly put into steady forward motion at $t=0$
 
-![Plunging airfoil case](Plots/Steady.gif)
+![Plunging airfoil case](Plots/Plunging.gif)
 
 
-This solver also allows for easily plotting velocity, vorticity and pressure fields:
+It is also possible to easily plot flow fields, such as velocity, vorticity and pressure fields:
 
-![Vorticity](Plots/PitchingSystem_Fields.png)
-
+![PitchingSystem_Fields](Plots/PitchingSystem_Fields.png)
 
 as well as force coefficients:
 
-![Vorticity](Plots/CL_PitchingMotion.png)
+![CL_PitchingMotion](Plots/CL_PitchingMotion.png)
 
 ### Example of usage:
 
