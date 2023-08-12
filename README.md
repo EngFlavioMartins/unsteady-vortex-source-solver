@@ -2,7 +2,7 @@
 
 `Unsteady_Lifting_Panel_Method` is a Python library with solvers that let you easily model and simulate unsteady airfoil aerodynamics based on the vortex source/panel method.
 
-![Pitching airfoil case](Plots/Pitching.gif)
+![Pitching airfoil case](Plots/Animation.gif)
 
 The current model solver a linear system with the following assumptions:
 
@@ -10,7 +10,7 @@ The current model solver a linear system with the following assumptions:
 2. Kelvin's theorem of conservation of circulation; and
 3. The vortex-source-induced velocities at the different wake and airfoil control points.
 
-For a more in-depth explanation of the model, please verify the corresponding topics in the literature shared in [References](#References) and the attached report `./Report.pdf`.
+For a more in-depth explanation of the model, please verify the corresponding topics in the literature shared in [References](#References) and the attached report `./Resources/Report.pdf`.
 
 Contents
 ========
@@ -41,7 +41,7 @@ It is also highly recommended to install Anaconda or Miniconda:
 ### Usage
 ---
 
-The Jupyter Notebook `./Examples.ipynb` contains a series of examples of how to use the current Python solver. The examples cover topics such as:
+The Jupyter Notebook `./Resources/Examples.ipynb` contains a series of examples of how to use the current Python solver. The examples cover topics such as:
 
 1. Wake-length independence analysis
 2. Number of blade panels for the discretization of the airfoil
@@ -64,11 +64,17 @@ The Jupyter Notebook `./Examples.ipynb` contains a series of examples of how to 
 
 It is also possible to easily plot flow fields, such as velocity, vorticity and pressure fields:
 
-![PitchingSystem_Fields](Plots/PitchingSystem_Fields.png)
+<p align="center">
+<img src="Plots/PitchingSystem_Fields.png"  width="90%">
+</p>
+
 
 as well as force coefficients:
 
-![CL_PitchingMotion](Plots/CL_PitchingMotion.png)
+<p align="center">
+<img src="Plots/CL_PitchingMotion.png"  width="90%">
+</p>
+
 
 ### Example of usage:
 
@@ -117,7 +123,9 @@ clTheo    = [np.sin(0), 2*np.pi*np.deg2rad(20) ]
 
 ---
 
-![Pitching airfoil case](Plots/Lifting_Line_Scheme.png)
+<p align="center">
+<img src="Plots/Lifting_Line_Scheme.png"  width="90%">
+</p>
 
  * Katz, Joseph, and Allen Plotkin. Low-speed aerodynamics. Vol. 13. Cambridge university press, 2001.
  * Anderson, John. EBOOK: Fundamentals of Aerodynamics (SI units). McGraw Hill, 2011.
