@@ -2,11 +2,9 @@
 
 `Unsteady_Lifting_Panel_Method` is a Python library with solvers that let you easily model and simulate unsteady airfoil aerodynamics based on the vortex source/panel method.
 
+![Pitching airfoil case](Plots/Pitching.gif)
 
-![Pitching airfoil case](Plots/Lifting_Line_Scheme.png)
-Lifting_Line_Scheme
-
-The curent model solver a linear system with the following assumptions:
+The current model solver a linear system with the following assumptions:
 
 1. Non-penetration boundary condition at the panels describing the airfoil's panels (i.e., the panel-normal fluid velocity is zero at the collocation points);
 2. Kelvin's theorem of conservation of circulation; and
@@ -19,7 +17,6 @@ Contents
 
  * [Installation](#installation)
  * [Usage](#usage)
- * [Output Structure](#output-structure)
  * [References](#References)
 
  ### Installation
@@ -51,11 +48,11 @@ The Jupyter Notebook `./Examples.ipynb` contains a series of examples of how to 
 3. Time-step sizing independence analysis
 4. Solution of steady flows: plot angle-of-attack vs. lift-coefficient to compare the current method against $2\pi$-curve
 
-5. Simulation of a flat-plate plunging airfoil at different reduced plunging frequencies, $k$, such that $ k := 2 \pi f c / U_\infty $, where $f$ is the plunging motion frequency, $c$ is the flat-plate's chord length and $U_\infty$ is the reference velocity.
+5. Simulation of a flat-plate plunging airfoil at different reduced plunging frequencies, $k$, such that $k := 2 \pi f c / U_\infty$, where $f$ is the plunging motion frequency, $c$ is the flat-plate's chord length and $U_\infty$ is the reference velocity.
 
 ![Plunging airfoil case](Plots/Plunging.gif)
 
-6. Simulation of a flat-plate pitching airfoil at different reduced pitching frequencies, $k$, such that $ k := 2 \pi f c / U_\infty $, where $f$ is the pitching motion frequency, $c$ is the flat-plate's chord length and $U_\infty$ is the reference velocity.
+6. Simulation of a flat-plate pitching airfoil at different reduced pitching frequencies, $k$, such that $k := 2 \pi f c / U_\infty$, where $f$ is the pitching motion frequency, $c$ is the flat-plate's chord length and $U_\infty$ is the reference velocity.
 
 ![Pitching airfoil case](Plots/Pitching.gif)
 
@@ -117,7 +114,10 @@ clTheo    = [np.sin(0), 2*np.pi*np.deg2rad(20) ]
 ```
 
 ### References
+
 ---
+
+![Pitching airfoil case](Plots/Lifting_Line_Scheme.png)
 
  * Katz, Joseph, and Allen Plotkin. Low-speed aerodynamics. Vol. 13. Cambridge university press, 2001.
  * Anderson, John. EBOOK: Fundamentals of Aerodynamics (SI units). McGraw Hill, 2011.
