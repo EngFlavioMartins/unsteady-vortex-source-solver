@@ -72,7 +72,7 @@ It is also possible to easily plot flow fields, such as velocity, vorticity and 
 as well as force coefficients:
 
 <p align="center">
-<img src="Plots/CL_PitchingMotion.png"  width="90%">
+<img src="Plots/CL_PitchingMotion.png"  width="80%">
 </p>
 
 
@@ -124,7 +124,7 @@ clTheo    = [np.sin(0), 2*np.pi*np.deg2rad(20) ]
 ---
 
 <p align="center">
-<img src="Plots/Lifting_Line_Scheme.png"  width="90%">
+<img src="Plots/Lifting_Line_Scheme.png"  width="80%">
 </p>
 
  * Katz, Joseph, and Allen Plotkin. Low-speed aerodynamics. Vol. 13. Cambridge university press, 2001.
