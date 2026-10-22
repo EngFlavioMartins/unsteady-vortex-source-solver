@@ -1,4 +1,5 @@
 import numpy as np
+from numba import njit
 
 from Lib.Classes       import bladePanel
 from Lib.Classes       import wakeVortex
@@ -67,19 +68,39 @@ def moveBlade(t, dt, U, V, myBladePanels, Theta, myTEVortex):
 
 
 
+def _active_wake(myWakeVortexes):
+      """The wake vortexes created so far (in shedding order)."""
+      return [v for v in myWakeVortexes if v is not None]
+
+
+@njit(cache=True)
+def _normal_wake_velocity(cps, normals, wx, wg):
+      """Velocity normal to each panel induced by point vortexes at wx with circulations wg."""
+      n, m = cps.shape[0], wx.shape[0]
+      out = np.zeros(n)
+      for i in range(n):
+            acc = 0.0
+            for j in range(m):
+                  dx = cps[i, 0] - wx[j, 0]
+                  dy = cps[i, 1] - wx[j, 1]
+                  c = wg[j] / (2 * np.pi * (dx * dx + dy * dy))
+                  acc += c * dy * normals[i, 0] - c * dx * normals[i, 1]
+            out[i] = acc
+      return out
+
+
 def wakeInducedVelocity(myBladePanels, myWakeVortexes):
       """
       This is the velocity the wake induced on the panels. W[i] = velocity normal to the i-th panel
       """
-      npanels = len(myBladePanels)
-      WIV = np.zeros(npanels) # wake-induced-velocity
-
-      for i, iPanel in enumerate(myBladePanels):
-            for jVortex in myWakeVortexes:
-                  if jVortex != None:
-                        WIV[i] += inducedVelocity(iPanel.Xcp, jVortex, jVortex.Gamma).dot(iPanel.n) # net effect of all vortexes in the wake
-
-      return WIV
+      wake = _active_wake(myWakeVortexes)
+      if not wake:
+            return np.zeros(len(myBladePanels))
+      cps = np.array([p.Xcp for p in myBladePanels], float)
+      normals = np.array([p.n for p in myBladePanels], float)
+      wx = np.array([v.Xv for v in wake], float)
+      wg = np.array([v.Gamma for v in wake], float)
+      return _normal_wake_velocity(cps, normals, wx, wg)
 
 
 
@@ -132,31 +153,49 @@ def logGamma(myBladePanels, myTEVortex, myWakeVortexes):
       print('Total Gamma: %0.2f\n' % totalGamma )
 
 
+@njit(cache=True)
+def _roll_up(wx, wg, bx, bg, tex, teg, dt):
+      """Move every wake vortex with the velocity induced by the trailing-edge vortex, the blade
+      vortexes and the other wake vortexes. Vortexes are moved one after another in place, so
+      each one sees the new positions of those moved before it, as in the original loop."""
+      n = wx.shape[0]
+      for i in range(n):
+            dx = wx[i, 0] - tex[0]
+            dy = wx[i, 1] - tex[1]
+            c = teg / (2 * np.pi * (dx * dx + dy * dy))
+            ux = c * dy
+            uy = -c * dx
+            for b in range(bx.shape[0]):
+                  dx = wx[i, 0] - bx[b, 0]
+                  dy = wx[i, 1] - bx[b, 1]
+                  c = bg[b] / (2 * np.pi * (dx * dx + dy * dy))
+                  ux += c * dy
+                  uy += -c * dx
+            for j in range(n):
+                  if j != i:
+                        dx = wx[i, 0] - wx[j, 0]
+                        dy = wx[i, 1] - wx[j, 1]
+                        c = wg[j] / (2 * np.pi * (dx * dx + dy * dy))
+                        ux += c * dy
+                        uy += -c * dx
+            wx[i, 0] += ux * dt
+            wx[i, 1] += uy * dt
+
+
 def vortexRollUp(myBladePanels, myTEVortex, myWakeVortexes, dt):
       """
       Determine the new positions of the wake vortexes:
       """
-
-      currentWakeVortexes = myWakeVortexes.copy()
-
-      for i, wVortex in enumerate(currentWakeVortexes):
-
-            rollVel = np.zeros(2)
-
-            if wVortex != None:
-            
-                  rollVel = inducedVelocity(wVortex.Xv, myTEVortex, myTEVortex.Gamma)
-
-                  for blade in myBladePanels:
-                        rollVel += inducedVelocity(wVortex.Xv, blade, blade.Gamma)
-
-                  for j, jVortex in enumerate(currentWakeVortexes):
-                        if (jVortex != None) and (i!=j):
-                              rollVel += inducedVelocity(wVortex.Xv, jVortex, jVortex.Gamma)
-      
-                  wVortex.Xv += rollVel * dt
-
-      myWakeVortexes = currentWakeVortexes.copy()
+      wake = _active_wake(myWakeVortexes)
+      if not wake:
+            return
+      wx = np.array([v.Xv for v in wake], float)
+      wg = np.array([v.Gamma for v in wake], float)
+      bx = np.array([b.Xv for b in myBladePanels], float)
+      bg = np.array([b.Gamma for b in myBladePanels], float)
+      _roll_up(wx, wg, bx, bg, np.asarray(myTEVortex.Xv, float), float(myTEVortex.Gamma), dt)
+      for v, x in zip(wake, wx):
+            v.Xv[:] = x
 
 
 

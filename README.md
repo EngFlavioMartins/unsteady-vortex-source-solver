@@ -1,131 +1,69 @@
-# Unsteady Lifting Panel Method
+# Unsteady vortex panel solver
 
-`Unsteady_Lifting_Panel_Method` is a Python library with solvers that let you easily model and simulate unsteady airfoil aerodynamics based on the vortex source/panel method.
+<p align="center">
+  <a href="https://github.com/EngFlavioMartins/unsteady-vortex-source-solver/actions/workflows/tests.yml"><img src="https://github.com/EngFlavioMartins/unsteady-vortex-source-solver/actions/workflows/tests.yml/badge.svg" alt="Regression tests"></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white" alt="python: 3.10+"></a>
+  <a href="https://github.com/EngFlavioMartins/unsteady-vortex-source-solver/blob/HEAD/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-2E7D32" alt="license: Apache 2.0"></a>
+</p>
 
-![Pitching airfoil case](Plots/Animation.gif)
+**Pitching and plunging airfoils and the wakes they shed, with an unsteady vortex panel method.**
 
-The current model solver a linear system with the following assumptions:
+<p align="center"><img src="docs/assets/animation.webp" width="560" alt="A plunging flat plate shedding a reverse von Kármán vortex street: teal and red vortices of opposite sign"></p>
 
-1. Non-penetration boundary condition at the panels describing the airfoil's panels (i.e., the panel-normal fluid velocity is zero at the collocation points);
-2. Kelvin's theorem of conservation of circulation; and
-3. The vortex-source-induced velocities at the different wake and airfoil control points.
+The airfoil is a row of vortex panels; at every time step the solver enforces no flow through the panels and Kelvin's theorem, sheds a vortex from the trailing edge and lets the whole wake roll up freely. It runs a thousand time steps in about two seconds. The derivation is in [Resources/Report.pdf](Resources/Report.pdf).
 
-For a more in-depth explanation of the model, please verify the corresponding topics in the literature shared in [References](#References) and the attached report `./Resources/Report.pdf`.
-
-Contents
-========
-
- * [Installation](#installation)
- * [Usage](#usage)
- * [References](#References)
-
- ### Installation
----
-
-The installation of the current project is very simple. If you have a clean Python installation, just type in your terminal the commands below.
+## Run it
 
 ```bash
-$ git clone https://github.com/PRIDEmartins/Unsteady_Vortex_Source_Method.git
-$ pip install numpy as np
-$ pip install importlib 
-$ pip install matplotlib.pyplot as plt
+git clone https://github.com/EngFlavioMartins/unsteady-vortex-source-solver.git
+cd unsteady-vortex-source-solver
+python run.py
 ```
 
-It is also highly recommended to install Anaconda or Miniconda:
+`run.py` simulates a plunging flat plate for 445 time steps and plots its circulation history and wake to `outputs/plunging_plate.png`. The first time, it installs what it needs into a private `.venv` folder (a minute or so); after that it starts at once. All you need is Python 3.10 or newer.
 
-> <https://docs.conda.io/en/latest/miniconda.html>
+<details>
+<summary>Prefer conda?</summary>
 
-> <https://www.anaconda.com/>
-
-
-### Usage
----
-
-The Jupyter Notebook `./Resources/Examples.ipynb` contains a series of examples of how to use the current Python solver. The examples cover topics such as:
-
-1. Wake-length independence analysis
-2. Number of blade panels for the discretization of the airfoil
-3. Time-step sizing independence analysis
-4. Solution of steady flows: plot angle-of-attack vs. lift-coefficient to compare the current method against $2\pi$-curve
-
-5. Simulation of a flat-plate plunging airfoil at different reduced plunging frequencies, $k$, such that $k := 2 \pi f c / U_\infty$, where $f$ is the plunging motion frequency, $c$ is the flat-plate's chord length and $U_\infty$ is the reference velocity.
-
-![Plunging airfoil case](Plots/Plunging.gif)
-
-6. Simulation of a flat-plate pitching airfoil at different reduced pitching frequencies, $k$, such that $k := 2 \pi f c / U_\infty$, where $f$ is the pitching motion frequency, $c$ is the flat-plate's chord length and $U_\infty$ is the reference velocity.
-
-![Pitching airfoil case](Plots/Pitching.gif)
-
-
-7. Simulation of a flat-plate airfoil suddenly put into steady forward motion at $t=0$
-
-![Plunging airfoil case](Plots/Plunging.gif)
-
-
-It is also possible to easily plot flow fields, such as velocity, vorticity and pressure fields:
-
-<p align="center">
-<img src="Plots/PitchingSystem_Fields.png"  width="90%">
-</p>
-
-
-as well as force coefficients:
-
-<p align="center">
-<img src="Plots/CL_PitchingMotion.png"  width="80%">
-</p>
-
-
-### Example of usage:
-
-```python
-ncases = 8
-
-alpha0       = np.linspace(0.1, 20, num=ncases) * np.pi/180  ## initial angle of attacks, rad
-npanels      = 10             ## number of blade panels
-finalTime    = 2.5            ## total time of simulation, s
-xVelocity    = -10            ## x-velocity of the airfoil, m/s
-yVelocity    = 0.0            ## plunging velocity of the airfoil, m/s
-rotFreq      = 0.0            ## rot. speed of the airfoil edge, Hz
-rotAmplitude = 0.0            ## amplitude of rotational motion, m
-plungAmpl    = 0.0            ## plunging amplitude, m
-plungFreq    = 0.0            ## plunging frequency, Hz
-nTimeSteps   = 10 * int( abs(finalTime*xVelocity) ) ## number of time steps 10, for steady cases
-
-## Total circulation around the airfoil:
-totalCirculation = np.zeros(len(alpha0))
-
-for n in range(ncases):
-
-      ## Below, we contruct and show the components of the panel system:
-      myBladePanels, myTEVortex, myWakeVortexes  = constructBladePanels(alpha0[n], npanels, nTimeSteps) # construct the blade panels
-
-      myWakeVortexes = np.empty(nTimeSteps-1, dtype=object) # constructWakeVortexes(nTimeSteps)
-
-      ## Here, we define the motion of the LE of the airfoil:
-      Time, timeStep, X, Y, U, V, Theta, Omega = LEmotion(nTimeSteps, finalTime, xVelocity, yVelocity, rotFreq, rotAmplitude, alpha0[n], plungAmpl, plungFreq)
-
-      ## Updates circulation of myBladePanels, myTEVortex, myWakeVortexes
-      ## returns: total circulation over airfoil at all time-steps
-      solution = solveVortexPanels(timeStep, U, V, myBladePanels, Theta, myTEVortex, myWakeVortexes, saveToFile=False)
-
-      totalCirculation[n] = solution[-1]
-
-
-## Plot results # =============================
-
-CL        = totalCirculation * np.cos(alpha0) / (0.5 * -U[-1]) # lift coeff.
-alphaTheo = [0, 20]
-clTheo    = [np.sin(0), 2*np.pi*np.deg2rad(20) ]
+```bash
+conda env create -f environment.yml
+conda activate unsteady-vortex-source-solver
+python examples/plunging_plate.py
 ```
 
-### References
+</details>
 
----
+**Next:** The notebook [MAIN.ipynb](MAIN.ipynb) covers wake-length, panel and time-step studies, steady lift against the 2π line, and pitching and plunging plates. `python -m pytest tests` checks the solver against the original code's results.
 
-<p align="center">
-<img src="Plots/Lifting_Line_Scheme.png"  width="80%">
-</p>
+## Figure and animation
 
- * Katz, Joseph, and Allen Plotkin. Low-speed aerodynamics. Vol. 13. Cambridge university press, 2001.
- * Anderson, John. EBOOK: Fundamentals of Aerodynamics (SI units). McGraw Hill, 2011.
+<p align="center"><img src="docs/assets/render.webp" width="560" alt="Reverse von Kármán street behind a plunging flat plate, coloured by vorticity"></p>
+
+The wake of a flat plate plunging at reduced frequency k = 1: a reverse von Kármán street, the thrust-producing arrangement. Each wake vortex is drawn as a small blob of its vorticity (teal and red: opposite senses of rotation).
+
+```bash
+sh scripts/render/make_figure.sh          # the figure
+python scripts/render/make_animation.py   # the animation at the top
+```
+
+The animation needs only Python; the figure also needs LaTeX.
+
+## Cite
+
+There is no paper for this solver. If it helps your work, please cite the repository:
+
+```bibtex
+@misc{martins_vortex_panel,
+  author       = {Martins, Flavio A. C.},
+  title        = {Unsteady vortex panel solver for pitching and plunging airfoils},
+  year         = {2023},
+  howpublished = {\url{https://github.com/EngFlavioMartins/unsteady-vortex-source-solver}},
+  note         = {Software, Apache-2.0 licence}
+}
+```
+
+GitHub's **Cite this repository** button (from [CITATION.cff](CITATION.cff)) gives the same reference in other formats.
+
+## Licence
+
+[Apache 2.0](LICENSE): you are free to use, change and share this code, also commercially. If you pass it on, keep the [NOTICE](NOTICE) file with it; it says where the code comes from and how to cite it.

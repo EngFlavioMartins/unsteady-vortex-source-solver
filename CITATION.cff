@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Unsteady vortex panel solver"
+type: software
+license: Apache-2.0
+abstract: "Unsteady vortex panel method in Python for pitching and plunging airfoils: no-penetration and Kelvin conditions at every time step, trailing-edge vortex shedding and free wake roll-up."
+keywords:
+  - "unsteady aerodynamics"
+  - "vortex panel method"
+  - "pitching airfoil"
+  - "plunging airfoil"
+  - "free wake"
+  - "vortex shedding"
+  - "potential flow"
+  - "Python"
+authors:
+  - family-names: Martins
+    given-names: Flavio A. C.
+    orcid: https://orcid.org/0000-0002-1374-5760
+repository-code: "https://github.com/EngFlavioMartins/unsteady-vortex-source-solver"
