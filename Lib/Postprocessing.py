@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.ndimage.filters import gaussian_filter
+from scipy.ndimage import gaussian_filter
 import pickle
 import glob
 from PIL import Image
@@ -94,30 +94,18 @@ def plotFields(myWakeVortexes, myBladePanels, myTEVortex, Uinf):
       x = np.linspace(LE[0]-1.2, LE[0]+8.2, num=nx)
       y = np.linspace(LE[1]-1.3, LE[1]+1.3, num=ny)
       xg, yg = np.meshgrid(x,y)
-      ug, vg = Uinf[0]*np.ones((ny,nx)), Uinf[1]*np.zeros((ny,nx))
+      ug, vg = Uinf[0]*np.ones((ny,nx)), Uinf[1]*np.zeros((ny,nx))   # (as before: no cross-stream free stream)
 
-      for vortex in myWakeVortexes:
-            if vortex != None:
-                  for i in range(ny):
-                        for j in range(nx):
-                              VEL = +inducedVelocity([xg[i,j],yg[i,j]], vortex, vortex.Gamma)
-                              ug[i,j] += VEL[0]
-                              vg[i,j] += VEL[1]
+      ## Velocity induced by every point vortex (wake, blade and trailing edge) at every grid point
+      vortexes = [v for v in myWakeVortexes if v is not None] + list(myBladePanels) + [myTEVortex]
+      vx = np.array([v.Xv for v in vortexes], float)
+      vgam = np.array([v.Gamma for v in vortexes], float)
+      dx = xg[..., None] - vx[:, 0]
+      dy = yg[..., None] - vx[:, 1]
+      c = vgam / (2 * np.pi * (dx**2 + dy**2))
+      ug += np.sum(c * dy, axis=-1)
+      vg += np.sum(-c * dx, axis=-1)
 
-      for blade in myBladePanels:
-            for i in range(ny):
-                  for j in range(nx):
-                        VEL = +inducedVelocity([xg[i,j],yg[i,j]], blade, blade.Gamma)
-                        ug[i,j] += VEL[0]
-                        vg[i,j] += VEL[1]
-
-      for i in range(ny):
-            for j in range(nx):
-                  VEL = +inducedVelocity([xg[i,j],yg[i,j]], myTEVortex, myTEVortex.Gamma)
-                  ug[i,j] += VEL[0]
-                  vg[i,j] += VEL[1]
-
-      
       ## Get the fields:
       Umag  = np.sqrt(Uinf[0]**2 + Uinf[1]**2)  ## reference velocity
       uNorm = gaussian_filter(ug/Umag, sigma=0.8, order=0)
